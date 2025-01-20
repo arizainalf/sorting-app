@@ -5,16 +5,19 @@ use Illuminate\Http\Request;
 
 class SortController extends Controller
 {
+    // menampilkan halaman menu awal
     public function menu()
     {
         return view('sort.menu');
     }
 
+    // menampilkan halaman input angka
     public function inputAngka()
     {
         return view('sort.input-angka');
     }
 
+    // menerima data angka lalu mengurutkannya dan disimpan di session
     public function sortNumbers(Request $request)
     {
         $request->validate([
@@ -32,6 +35,7 @@ class SortController extends Controller
         return redirect()->route('sort.index');
     }
 
+    // menghapus data angka yang ada di session
     public function clearSortNumber()
     {
         session()->forget('sorted_numbers');
@@ -39,6 +43,7 @@ class SortController extends Controller
         return redirect()->route('sort.index');
     }
 
+    // menampilkan hasil dari pengurutan data angka
     public function result()
     {
         if (! session()->has('sorted_numbers')) {
@@ -49,6 +54,7 @@ class SortController extends Controller
         return view('sort.result', compact('numbers'));
     }
 
+    // mendownload hasil dari pengurutan data angka ke dalam format .txt
     public function download()
     {
         $numbers = session('sorted_numbers', []);
@@ -56,20 +62,18 @@ class SortController extends Controller
             return redirect()->route('sort.index')->with('error', 'Tidak ada data untuk diunduh.');
         }
 
+        // Tentukan nama file dengan timestamp untuk menghindari duplikasi
         $filename = 'sorted_numbers_' . now()->timestamp . '.txt';
         $content  = implode("\n", $numbers);
 
+        // Menyimpan file secara lokal di storage
+        $path = storage_path('app/public/' . $filename);
+        file_put_contents($path, $content);
+
         session()->flash('success', 'Data berhasil diunduh.');
 
-        return response()->streamDownload(function () use ($content) {
-            echo $content;
-        }, $filename, [
-            'Content-Type'              => 'text/plain',
-            'Content-Disposition'       => "attachment; filename={$filename}",
-            'Cache-Control'             => 'no-cache',
-            'Content-Transfer-Encoding' => 'binary',
-            'Connection'                => 'keep-alive',
-        ]);
+        // Mengunduh file yang telah disimpan secara lokal
+        return response()->download($path)->deleteFileAfterSend(true);
     }
 
 }

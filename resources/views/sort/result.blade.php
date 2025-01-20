@@ -30,6 +30,9 @@
 </head>
 
 <body>
+    @php
+        dd($numbers);
+    @endphp
     <div class="menu-container">
         <h5 class="mb-2">Hasil Pengurutan</h5>
         <div class="d-grid gap-2">

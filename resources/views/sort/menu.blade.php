@@ -44,6 +44,7 @@
             </div>
         @endif
 
+        {{-- menu pilihan  --}}
         <h5 class="mb-2">Menu Pilihan</h5>
         <div class="d-grid gap-2">
             <hr>
