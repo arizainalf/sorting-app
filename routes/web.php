@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SortController;
 
 Route::get('/', [SortController::class, 'menu'])->name('sort.index');
