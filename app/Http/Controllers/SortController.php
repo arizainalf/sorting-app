@@ -70,7 +70,7 @@ class SortController extends Controller
         // Save the content to disk
         Storage::disk('public')->put($filename, $content);
 
-// Simpan URL ke session untuk diakses di view
+        // Simpan URL ke session untuk diakses di view
         session(['file_url' => $filename]);
 
         session()->flash('success', 'Berhasil mengunduh hasil pengurutan angka.');
