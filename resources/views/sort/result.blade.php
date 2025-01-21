@@ -38,7 +38,15 @@
             @foreach ($numbers as $number)
                 @php
                     // Array warna tombol
-                    $colors = ['btn-success', 'btn-warning', 'btn-danger', 'btn-info', 'btn-primary', 'btn-secondary', 'btn-dark'];
+                    $colors = [
+                        'btn-success',
+                        'btn-warning',
+                        'btn-danger',
+                        'btn-info',
+                        'btn-primary',
+                        'btn-secondary',
+                        'btn-dark',
+                    ];
                     // Pilih warna secara acak
                     $btnClass = $colors[array_rand($colors)];
                 @endphp
@@ -46,6 +54,9 @@
             @endforeach
             <hr>
             <a id="download-btn" href="{{ route('sort.download') }}" class="btn btn-outline-success">Download</a>
+            @if (session('file_url'))
+                <a href="{{ url('/storage'). '/' . session('file_url') }}" target="_blank" class="btn btn-outline-primary">Buka File</a></p>
+            @endif
         </div>
     </div>
 
@@ -59,7 +70,7 @@
                     setTimeout(() => {
                         // Redirect setelah unduhan (0.5 detik)
                         window.location.href = "{{ route('sort.index') }}";
-                    }, 500); // Sesuaikan waktu delay
+                    }, 3000); // Sesuaikan waktu delay
                 });
             }
         });

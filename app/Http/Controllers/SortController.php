@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SortController extends Controller
 {
@@ -38,7 +39,7 @@ class SortController extends Controller
     // menghapus data angka yang ada di session
     public function clearSortNumber()
     {
-        session()->forget('sorted_numbers');
+        session()->flush();
         session()->flash('success', 'Sukses menghapus data angka yang tersimpan.');
         return redirect()->route('sort.index');
     }
@@ -58,6 +59,7 @@ class SortController extends Controller
     public function download()
     {
         $numbers = session('sorted_numbers', []);
+
         if (empty($numbers)) {
             return redirect()->route('sort.index')->with('error', 'Tidak ada data untuk diunduh.');
         }
@@ -65,19 +67,20 @@ class SortController extends Controller
         $filename = 'sorted_numbers_' . now()->timestamp . '.txt';
         $content  = implode("\n", $numbers);
 
-        $path = storage_path('app/public/' . $filename);
-        file_put_contents($path, $content);
+        // Save the content to disk
+        Storage::disk('public')->put($filename, $content);
 
-        session()->flash('success', 'Data berhasil diunduh.');
+// Simpan URL ke session untuk diakses di view
+        session(['file_url' => $filename]);
 
-        return response()->streamDownload(function () use ($content) {
-            echo $content;
+        session()->flash('success', 'Berhasil mengunduh hasil pengurutan angka.');
+
+        // Stream the file for download
+        return response()->streamDownload(function () use ($filename) {
+            echo Storage::disk('public')->get($filename);
         }, $filename, [
-            'Content-Type'              => 'text/plain',
-            'Content-Disposition'       => "attachment; filename={$filename}",
-            'Cache-Control'             => 'no-cache',
-            'Content-Transfer-Encoding' => 'binary',
-            'Connection'                => 'keep-alive',
+            'Content-Type'        => 'text/plain',
+            'Content-Disposition' => "attachment; filename={$filename}",
         ]);
     }
 
