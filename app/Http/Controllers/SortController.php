@@ -62,18 +62,23 @@ class SortController extends Controller
             return redirect()->route('sort.index')->with('error', 'Tidak ada data untuk diunduh.');
         }
 
-        // Tentukan nama file dengan timestamp untuk menghindari duplikasi
         $filename = 'sorted_numbers_' . now()->timestamp . '.txt';
         $content  = implode("\n", $numbers);
 
-        // Menyimpan file secara lokal di storage
         $path = storage_path('app/public/' . $filename);
         file_put_contents($path, $content);
 
         session()->flash('success', 'Data berhasil diunduh.');
 
-        // Mengunduh file yang telah disimpan secara lokal
-        return response()->download($path)->deleteFileAfterSend(true);
+        return response()->streamDownload(function () use ($content) {
+            echo $content;
+        }, $filename, [
+            'Content-Type'              => 'text/plain',
+            'Content-Disposition'       => "attachment; filename={$filename}",
+            'Cache-Control'             => 'no-cache',
+            'Content-Transfer-Encoding' => 'binary',
+            'Connection'                => 'keep-alive',
+        ]);
     }
 
 }
