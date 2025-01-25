@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\Debugbar\Facades\Debugbar;
 
 class SortController extends Controller
 {
@@ -23,11 +24,13 @@ class SortController extends Controller
     {
         $request->validate([
             'numbers'   => 'required|array|min:1',
-            'numbers.*' => 'required|numeric',
+            'numbers.*' => 'required',
         ]);
 
         $numbers = $request->input('numbers');
         sort($numbers);
+
+        Debugbar::info($numbers);
 
         // Simpan hasil di session
         session(['sorted_numbers' => $numbers]);
@@ -52,6 +55,7 @@ class SortController extends Controller
             return redirect()->route('sort.index');
         }
         $numbers = session('sorted_numbers', []);
+        Debugbar::info($numbers);
         return view('sort.result', compact('numbers'));
     }
 
